@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1e6fd9">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="موج مجاز">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>محاسبه موج مجاز - صافی سطح</title>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f4f6f8;--card:#fff;--tx:#1b2430;--mut:#667085;--bd:#d9dee5;--ac:#1e6fd9;--hl:#fff3c4;--ok:#0f8a4b}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12161c;--card:#1b222b;--tx:#e7ebf0;--mut:#9aa6b4;--bd:#2f3946;--ac:#5aa2ff;--hl:#4a3f12;--ok:#4fd18b}}
+:root[data-theme="dark"]{--bg:#12161c;--card:#1b222b;--tx:#e7ebf0;--mut:#9aa6b4;--bd:#2f3946;--ac:#5aa2ff;--hl:#4a3f12;--ok:#4fd18b}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:Vazirmatn,Tahoma,sans-serif;line-height:1.7}
+.w{max-width:520px;margin:0 auto;padding:16px}
+h1{font-size:19px;margin:8px 0 14px}
+.c{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px;margin-bottom:14px}
+label{display:block;font-size:14px;color:var(--mut);margin:8px 0 4px}
+select,input{width:100%;font:inherit;font-size:16px;padding:10px;border:1px solid var(--bd);border-radius:10px;background:var(--bg);color:var(--tx)}
+.row{display:flex;gap:10px}.row>div{flex:1}
+.res{text-align:center;padding:16px 8px}
+.res .n{font-size:40px;font-weight:700;color:var(--ok)}
+.res .s{color:var(--mut);font-size:14px}
+.err{color:#d92d20;text-align:center;font-size:14px}
+.tw{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14px;text-align:center}
+th,td{border:1px solid var(--bd);padding:8px 6px}
+th{background:var(--bg)}
+tr.h td{background:var(--hl);font-weight:700}
+.note{font-size:12px;color:var(--mut);margin-top:8px}
+</style>
+</head>
+<body>
+<div class="w">
+<h1>موج مجاز ورق – صافی سطح</h1>
+
+<div class="c">
+<label for="code">کد / حالت صافی سطح</label>
+<select id="code">
+<option value="edge">الف) مقصد نورد – موج کناری</option>
+<option value="center">الف) مقصد نورد – موج مرکزی</option>
+<option value="007">ب) فروش از اسید شویی – کد ۰۰۷</option>
+<option value="009">ب) فروش از اسید شویی – کد ۰۰۹</option>
+<option value="056">ب) فروش از اسید شویی – کد ۰۵۶</option>
+<option value="057">ب) فروش از اسید شویی – کد ۰۵۷</option>
+<option value="047">استاندارد EN 10051 – کد ۰۴۷</option>
+</select>
+<div id="dims" style="display:none">
+<div class="row">
+<div><label for="t">ضخامت T (mm)</label><input id="t" type="number" inputmode="decimal" step="any" min="0" placeholder="مثلاً 1.8"></div>
+<div><label for="w">عرض W (mm)</label><input id="w" type="number" inputmode="decimal" step="any" min="0" placeholder="مثلاً 1250"></div>
+</div>
+</div>
+</div>
+
+<div class="c res" id="out"></div>
+
+<div class="c tw" id="tbl" style="display:none">
+<table>
+<thead><tr><th>ضخامت T (mm)</th><th>عرض W (mm)</th><th>موج مجاز (mm)</th></tr></thead>
+<tbody>
+<tr data-r="0"><td rowspan="3">۱٫۲ ≤ T &lt; ۱٫۵</td><td>W ≤ 900</td><td>۱۵</td></tr>
+<tr data-r="1"><td>900 &lt; W ≤ 1500</td><td>۲۰</td></tr>
+<tr data-r="2"><td>W ≥ 1500</td><td>۲۵</td></tr>
+<tr data-r="3"><td rowspan="3">۱٫۵ ≤ T &lt; ۴٫۵</td><td>W ≤ 1500</td><td>۱۵</td></tr>
+<tr data-r="4"><td>1500 &lt; W ≤ 1800</td><td>۲۰</td></tr>
+<tr data-r="5"><td>W ≥ 1800</td><td>۲۵</td></tr>
+<tr data-r="6"><td>T ≥ ۴٫۵</td><td>—</td><td>۱۵</td></tr>
+</tbody>
+</table>
+<div class="note">در جدول اصلی، عرض ۱۵۰۰ برای ضخامت ۱٫۲ تا ۱٫۵ در دو ردیف آمده است؛ در این برنامه مقدار ۱۵۰۰ دقیقاً در ردیف «۲۰» محاسبه می‌شود.</div>
+</div>
+<div class="c tw" id="tbl2" style="display:none">
+<table>
+<thead><tr><th>ضخامت T (mm)</th><th>عرض W (mm)</th><th>موج مجاز (mm)</th></tr></thead>
+<tbody>
+<tr data-q="0"><td rowspan="3">T ≤ ۲</td><td>W ≤ 1200</td><td>۱۸</td></tr>
+<tr data-q="1"><td>1200 &lt; W ≤ 1500</td><td>۲۰</td></tr>
+<tr data-q="2"><td>W ≥ 1500</td><td>۲۵</td></tr>
+<tr data-q="3"><td rowspan="3">T &gt; ۲</td><td>W ≤ 1200</td><td>۱۵</td></tr>
+<tr data-q="4"><td>1200 &lt; W ≤ 1500</td><td>۱۸</td></tr>
+<tr data-q="5"><td>W ≥ 1500</td><td>۲۳</td></tr>
+</tbody>
+</table>
+<div class="note">عرض دقیقاً ۱۵۰۰ در ردیف میانی (۱۲۰۰ &lt; W ≤ ۱۵۰۰) محاسبه می‌شود.</div>
+</div>
+</div>
+
+<script>
+var $=function(i){return document.getElementById(i)};
+var fa=function(n){return String(n).replace(/\d/g,function(d){return '۰۱۲۳۴۵۶۷۸۹'[d]})};
+function norm(v){return parseFloat(String(v).replace(/[۰-۹]/g,function(d){return '۰۱۲۳۴۵۶۷۸۹'.indexOf(d)}).replace('٫','.'))}
+function lookup(T,W){
+ if(T>=4.5)return {v:15,r:6};
+ if(T>=1.5){ if(W<=1500)return{v:15,r:3}; if(W<1800)return{v:20,r:4}; return{v:25,r:5}; }
+ if(T>=1.2){ if(W<=900)return{v:15,r:0}; if(W<=1500)return{v:20,r:1}; return{v:25,r:2}; }
+ return null;
+}
+function lookup47(T,W){
+ var a=T<=2;
+ if(W<=1200)return{v:a?18:15,q:a?0:3};
+ if(W<=1500)return{v:a?20:18,q:a?1:4};
+ return{v:a?25:23,q:a?2:5};
+}
+function show(v,sub){$('out').innerHTML='<div class="s">'+sub+'</div><div class="n">'+fa(v)+' mm</div><div class="s">حداکثر موج قابل قبول</div>'}
+function upd(){
+ var c=$('code').value, en=c==='047',pk=!(c==='edge'||c==='center'||en);
+ $('dims').style.display=(pk||en)?'block':'none';$('tbl2').style.display=en?'block':'none';
+ $('tbl').style.display=pk?'block':'none';
+ var rows=document.querySelectorAll('tr[data-r]');
+ for(var i=0;i<rows.length;i++)rows[i].className='';
+ var rq=document.querySelectorAll('tr[data-q]');for(i=0;i<rq.length;i++)rq[i].className='';
+ if(c==='edge'){show(25,'موج کناری – مقصد نورد (ادامه سیکل)');return}
+ if(c==='center'){show(35,'موج مرکزی – مقصد نورد (ادامه سیکل)');return}
+ var T=norm($('t').value),W=norm($('w').value);
+ if(isNaN(T)||isNaN(W)){$('out').innerHTML='<div class="s">ضخامت و عرض را وارد کنید (یا ردیف‌های جدول را ببینید)</div>';return}
+ if(en){var q=lookup47(T,W);document.querySelector('tr[data-q="'+q.q+'"]').className='h';show(q.v,'کد ۰۴۷ (EN 10051) – T='+fa(T)+' ، W='+fa(W));return}
+ var r=lookup(T,W);
+ if(!r){$('out').innerHTML='<div class="err">ضخامت کمتر از ۱٫۲ mm در این جدول تعریف نشده است.</div>';return}
+ document.querySelector('tr[data-r="'+r.r+'"]').className='h';
+ show(r.v,'کد '+fa(c)+' (ASTM A568) – T='+fa(T)+' ، W='+fa(W));
+}
+$('code').onchange=upd;$('t').oninput=upd;$('w').oninput=upd;upd();
+if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})})}
+</script>
+</body>
+</html>
